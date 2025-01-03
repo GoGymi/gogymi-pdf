@@ -1,4 +1,5 @@
 {
+  "name": "gogymi-pdf",
   "dependencies": {
     "jspdf": "^2.5.2"
   },
