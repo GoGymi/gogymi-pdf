@@ -11,4 +11,7 @@ pdf.addTable([
     ([x,y,w]) => pdf.insertText("Hiii!",[x,y],w),
   ]
 ],[100,200])
+let a = new Array(50).fill(0)
+a.map((_, n) => pdf.addParagraph((n+1) + "."))
+pdf.addParagraph("END")
 pdf.save("newtitle")
