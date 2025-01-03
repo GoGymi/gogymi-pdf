@@ -3,6 +3,17 @@ import { jsPDF } from "jspdf";
 export interface TextConfig {
   px?: number;
 }
+
+export const STYLES = {
+  h1: {size: 32},
+  h2: {size: 24},
+  h3: {size: 18},
+  h4: {size: 14},
+  h5: {size: 12},
+  h6: {size: 10},
+  body2: {size: 10},
+}
+
 export class PDF {
   doc: jsPDF;
   y: number;
@@ -14,6 +25,7 @@ export class PDF {
       format: "a4",
     });
     this.y = 8;
+    this.doc.setFontSize(11)
   }
   addParagraph(text: string, config?: TextConfig): void {
     let px = config?.px ?? 0
@@ -46,10 +58,15 @@ export class PDF {
     return 8
   }
   insertText(text: string, topLeft: [number,number], width: number, config?: any) {
+    let textSize = config?.size ?? 11
+    this.doc.setFontSize(textSize)
+
     let splitText: string[] = this.doc.splitTextToSize(text,width)
-    console.log(splitText, topLeft[0], topLeft[1])
+
     this.doc.text(splitText, topLeft[0], topLeft[1], {baseline: "top"});
-    return splitText.length * 14
+
+    // Might need something with line height factor idk
+    return splitText.length * textSize
   }
   addTable(contents: Array<Array<(positioning: [number,number,number]) => number>>, widths: number[], config?: any) {
 
