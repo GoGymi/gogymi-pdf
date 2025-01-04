@@ -104,7 +104,7 @@ export class PDF {
     let textStyle = config?.style ?? "normal"
     this.doc.setFont("Arial",textStyle)
 
-    let textColor = config?.color ?? "#FFFFFF"
+    let textColor = config?.color ?? "#000000"
     this.doc.setTextColor(textColor)
 
     let [pl, pt, pr, pb] = this.computePadding(config)
