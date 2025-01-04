@@ -4,6 +4,7 @@ export interface TextConfig {
   size?: number;
   style?: "normal" | "itatlic" | "bold"
   color?: string
+  align?: "left" | "center" | "right" | "justify"
 }
 export interface PaddingConfig {
   p?: number;
@@ -108,7 +109,7 @@ export class PDF {
     let splitText: string[] = this.doc.splitTextToSize(text, width - pl - pr)
 
     return [splitText.length * textSize + pt + pb, () => {
-      this.doc.text(splitText, topLeft[0] + pl, topLeft[1] + pt, { baseline: "top" });
+      this.doc.text(splitText, topLeft[0] + pl, topLeft[1] + pt, { align: config.align ?? "left" , baseline: "top", maxWidth: width - pl - pr });
     }]
   }
   addTable(contents: Array<Array<(positioning: [number, number, number]) => [number, () => void]>>, widths: number[], config?: any) {
