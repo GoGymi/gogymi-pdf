@@ -53,7 +53,7 @@ export class PDF {
   }
   addParagraph(text: string, config?: TextConfig & PaddingConfig): void {
     let px = config?.px ?? 0
-    let width = 531 - px * 2
+    let width = 416 - px * 2
     let [h, doIt] = this.insertText(text, [32 + px, this.y], width, config)
 
     if (this.y + h > 600) {
