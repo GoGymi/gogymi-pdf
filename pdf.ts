@@ -1,10 +1,18 @@
 import { jsPDF } from "jspdf";
 
-export interface ParaConfig {
-  px?: number;
-}
 export interface TextConfig {
   size?: number;
+  style?: "normal" | "itatlic" | "bold"
+  color?: string
+}
+export interface PaddingConfig {
+  p?: number;
+  px?: number;
+  py?: number;
+  pl?: number;
+  pt?: number;
+  pr?: number;
+  pb?: number;
 }
 
 export const STYLES = {
@@ -30,11 +38,20 @@ export class PDF {
     this.y = 32;
     this.doc.setFontSize(11)
   }
-  addParagraph(text: string, config?: TextConfig & ParaConfig): void {
+  computePadding(config: PaddingConfig) {
+    // Uses left top right bottom order
+    return [
+      ((config.pl ?? config.px) ?? config.p) ?? 0,
+      ((config.pt ?? config.py) ?? config.p) ?? 0,
+      ((config.pr ?? config.px) ?? config.p) ?? 0,
+      ((config.pb ?? config.py) ?? config.p) ?? 0
+    ]
+  }
+  addParagraph(text: string, config?: TextConfig & PaddingConfig): void {
     let px = config?.px ?? 0
     let width = 531 - px * 2
     let [h, doIt] = this.insertText(text, [32 + px, this.y], width, config)
-    
+
     if (this.y + h > 600) {
       this.doc.addPage("a4", "p")
       this.y = 32
@@ -51,8 +68,10 @@ export class PDF {
     this.doc.text("https://gogymi.ch/", 300, this.y + 36);
     this.y += 64
   }
-  insertBar(value: number, maxValue: number, topLeft: [number, number], width: number) : [number, () => void] {
-    return [8, () => {
+  insertBar(value: number, maxValue: number, topLeft: [number, number], width: number, config?: PaddingConfig) : [number, () => void] {
+    let [pl, pt, pr, pb] = this.computePadding(config)
+
+    return [8 + pt + pb, () => {
 
       const normalizedValue = (value / maxValue) * 100;
 
@@ -68,19 +87,28 @@ export class PDF {
       const barColor = getColor(normalizedValue);
 
       this.doc.setFillColor("#DDDDDD")
-      this.doc.roundedRect(topLeft[0], topLeft[1], width, 8, 4, 4, "F")
+      this.doc.roundedRect(topLeft[0] + pl, topLeft[1] + pt, width - pl - pr, 8, 4, 4, "F")
       this.doc.setFillColor(barColor)
-      this.doc.roundedRect(topLeft[0], topLeft[1], width * normalizedValue / 100, 8, 4, 4, "F")
+      this.doc.roundedRect(topLeft[0] + pl, topLeft[1] + pt, (width - pl - pr)* normalizedValue / 100, 8, 4, 4, "F")
     }]
   }
-  insertText(text: string, topLeft: [number, number], width: number, config?: any): [number, () => void] {
+  insertText(text: string, topLeft: [number, number], width: number, config?: TextConfig & PaddingConfig): [number, () => void] {
+    console.log(config)
     let textSize = config?.size ?? 11
     this.doc.setFontSize(textSize)
 
-    let splitText: string[] = this.doc.splitTextToSize(text, width)
+    let textStyle = config?.style ?? "normal"
+    this.doc.setFont("Arial",textStyle)
 
-    return [splitText.length * textSize, () => {
-      this.doc.text(splitText, topLeft[0], topLeft[1], { baseline: "top" });
+    let textColor = config?.style ?? "#FFFFFF"
+    this.doc.setTextColor(textColor)
+
+    let [pl, pt, pr, pb] = this.computePadding(config)
+
+    let splitText: string[] = this.doc.splitTextToSize(text, width - pl - pr)
+
+    return [splitText.length * textSize + pt + pb, () => {
+      this.doc.text(splitText, topLeft[0] + pl, topLeft[1] + pt, { baseline: "top" });
     }]
   }
   addTable(contents: Array<Array<(positioning: [number, number, number]) => [number, () => void]>>, widths: number[], config?: any) {
@@ -91,7 +119,7 @@ export class PDF {
         return [base ?? 0]
       }
       let prev = cumSum0(a.slice(0, -1), base)
-      prev.push(a.slice(-1)[0])
+      prev.push(a.slice(-1)[0]+prev.slice(-1)[0])
       return prev
     }
     const lefts = cumSum0(widths, 32)
