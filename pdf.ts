@@ -53,7 +53,7 @@ export class PDF {
   }
   addParagraph(text: string, config?: TextConfig & PaddingConfig): void {
     let px = config?.px ?? 0
-    let width = 416 - px * 2
+    let width = 384 - px * 2
     let [h, doIt] = this.insertText(text, [32 + px, this.y], width, config)
 
     if (this.y + h > 600) {
@@ -102,7 +102,7 @@ export class PDF {
     this.doc.setFontSize(textSize)
 
     let textStyle = config?.style ?? "normal"
-    this.doc.setFont("Arial",textStyle)
+    this.doc.setFont("Helvetica",textStyle)
 
     let textColor = config?.color ?? "#000000"
     this.doc.setTextColor(textColor)
@@ -111,8 +111,24 @@ export class PDF {
 
     let splitText: string[] = this.doc.splitTextToSize(text, width - pl - pr)
 
+    let x;
+    switch (config?.align ?? "left") {
+      case "left":
+        x = topLeft[0] + pl
+        break
+      case "center":
+        x = topLeft[0] + 0.5*(width + pl - pr)
+        break
+      case "right": 
+        x = topLeft[0] + width - pr
+        break
+      case"justify":
+        x = topLeft[0] + pl
+        break
+    }
+
     return [splitText.length * textSize + pt + pb, () => {
-      this.doc.text(splitText, topLeft[0] + pl, topLeft[1] + pt, { align: config.align ?? "left" , baseline: "top", maxWidth: width - pl - pr });
+      this.doc.text(splitText, x, topLeft[1] + pt, { align: config?.align ?? "left" , baseline: "top", maxWidth: width - pl - pr });
     }]
   }
   addTable(contents: Array<Array<(positioning: [number, number, number]) => [number, () => void]>>, widths: number[], config?: any) {

@@ -2,6 +2,8 @@ import { PDF, STYLES } from "./pdf";
 
 const pdf = new PDF()
 pdf.addHead()
+console.log(pdf.doc.getFontList())
+pdf.addParagraph("Really long text that is really long and will hopefully exceed the size of the page lets go this is a good test")
 pdf.addTable([
   [
     ([x,y,w]) => pdf.insertText("Short",[x,y],w),
