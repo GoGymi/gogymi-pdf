@@ -39,7 +39,10 @@ export class PDF {
     this.y = 32;
     this.doc.setFontSize(11)
   }
-  computePadding(config: PaddingConfig) {
+  computePadding(config?: PaddingConfig) {
+    if (!config) {
+      return [0,0,0,0]
+    }
     // Uses left top right bottom order
     return [
       ((config.pl ?? config.px) ?? config.p) ?? 0,
