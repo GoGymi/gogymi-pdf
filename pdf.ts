@@ -1,20 +1,5 @@
 import { jsPDF } from "jspdf";
-
-export interface TextConfig {
-  size?: number;
-  style?: "normal" | "itatlic" | "bold"
-  color?: string
-  align?: "left" | "center" | "right" | "justify"
-}
-export interface PaddingConfig {
-  p?: number;
-  px?: number;
-  py?: number;
-  pl?: number;
-  pt?: number;
-  pr?: number;
-  pb?: number;
-}
+import { TextConfig, PaddingConfig, InsertTextParams } from "./types";
 
 export const STYLES = {
   h1: { size: 32 },
@@ -25,6 +10,8 @@ export const STYLES = {
   h6: { size: 10 },
   body2: { size: 10 },
 }
+
+type RichText = Array<string | TextConfig & { text: string }>
 
 export class PDF {
   doc: jsPDF;
@@ -41,7 +28,7 @@ export class PDF {
   }
   computePadding(config?: PaddingConfig) {
     if (!config) {
-      return [0,0,0,0]
+      return [0, 0, 0, 0]
     }
     // Uses left top right bottom order
     return [
@@ -62,9 +49,21 @@ export class PDF {
       let newInsert = this.insertText(text, [32 + px, this.y], width, config)
       h = newInsert[0]
       doIt = newInsert[1]
-    } 
+    }
     doIt()
     this.y += h
+  }
+  addRichText(text: RichText, baseConfig: TextConfig & PaddingConfig): void {
+    let textElements = this.richTextLayout(text,[32, this.y], 384, baseConfig)
+
+    let pageOffset = 0
+
+    for (let i of textElements) {
+      if ((i.height + i.topLeft[1] - pageOffset) > 600) {
+        pageOffset += 568
+      }
+      this.insertText(i.text,[i.topLeft[0],i.topLeft[1] - pageOffset],i.width, i.config)[1]()
+    }
   }
   addHead() {
     this.y -= 24
@@ -72,7 +71,7 @@ export class PDF {
     this.doc.text("https://gogymi.ch/", 300, this.y + 36);
     this.y += 64
   }
-  insertBar(value: number, maxValue: number, topLeft: [number, number], width: number, config?: PaddingConfig) : [number, () => void] {
+  insertBar(value: number, maxValue: number, topLeft: [number, number], width: number, config?: PaddingConfig): [number, () => void] {
     let [pl, pt, pr, pb] = this.computePadding(config)
 
     return [8 + pt + pb, () => {
@@ -93,16 +92,51 @@ export class PDF {
       this.doc.setFillColor("#DDDDDD")
       this.doc.roundedRect(topLeft[0] + pl, topLeft[1] + pt, width - pl - pr, 8, 4, 4, "F")
       this.doc.setFillColor(barColor)
-      this.doc.roundedRect(topLeft[0] + pl, topLeft[1] + pt, (width - pl - pr)* normalizedValue / 100, 8, 4, 4, "F")
+      this.doc.roundedRect(topLeft[0] + pl, topLeft[1] + pt, (width - pl - pr) * normalizedValue / 100, 8, 4, 4, "F")
     }]
+  }
+  richTextLayout(text: RichText, topLeft: [number, number], width: number, baseConfig?: TextConfig) {
+    let offset: [number,number] = [topLeft[0] , topLeft[1]]
+    let elements: InsertTextParams[] = []
+
+    while (text.length > 0) {
+      let currentText = typeof text[0] == "string" ? text[0] : text[0].text
+
+      let firstLine = this.doc.splitTextToSize(currentText, width - offset[0])[0]
+
+      let textWidth = this.doc.getStringUnitWidth(currentText) * this.doc.getFontSize()
+
+      elements.push({
+        text: firstLine,
+        topLeft: [...offset],
+        width: textWidth,
+        height: this.doc.getFontSize(),
+        config: {...baseConfig,...(typeof text[0] == "string" ? {} : text[0])}
+      })
+
+      if (firstLine.length == currentText.length) {
+        text = text.slice(1)
+        offset[0] += this.doc.getStringUnitWidth(currentText) * this.doc.getFontSize()
+      } else {
+        offset[0] = topLeft[0]
+        offset[1] += this.doc.getLineHeight()
+        if (typeof text[0] == "string") {
+          text[0] = currentText.slice(firstLine.length)
+        } else {
+          text[0].text = currentText.slice(firstLine.length)
+        }
+      }
+    }
+    return elements
   }
   insertText(text: string, topLeft: [number, number], width: number, config?: TextConfig & PaddingConfig): [number, () => void] {
     console.log(config)
+    console.log(topLeft)
     let textSize = config?.size ?? 11
     this.doc.setFontSize(textSize)
 
     let textStyle = config?.style ?? "normal"
-    this.doc.setFont("Helvetica",textStyle)
+    this.doc.setFont("Helvetica", textStyle)
 
     let textColor = config?.color ?? "#000000"
     this.doc.setTextColor(textColor)
@@ -117,18 +151,18 @@ export class PDF {
         x = topLeft[0] + pl
         break
       case "center":
-        x = topLeft[0] + 0.5*(width + pl - pr)
+        x = topLeft[0] + 0.5 * (width + pl - pr)
         break
-      case "right": 
+      case "right":
         x = topLeft[0] + width - pr
         break
-      case"justify":
+      case "justify":
         x = topLeft[0] + pl
         break
     }
 
     return [splitText.length * textSize + pt + pb, () => {
-      this.doc.text(splitText, x, topLeft[1] + pt, { align: config?.align ?? "left" , baseline: "top", maxWidth: width - pl - pr });
+      this.doc.text(splitText, x, topLeft[1] + pt, { align: config?.align ?? "left", baseline: "top", maxWidth: width - pl - pr });
     }]
   }
   addTable(contents: Array<Array<(positioning: [number, number, number]) => [number, () => void]>>, widths: number[], config?: any) {
@@ -139,7 +173,7 @@ export class PDF {
         return [base ?? 0]
       }
       let prev = cumSum0(a.slice(0, -1), base)
-      prev.push(a.slice(-1)[0]+prev.slice(-1)[0])
+      prev.push(a.slice(-1)[0] + prev.slice(-1)[0])
       return prev
     }
     const lefts = cumSum0(widths, 32)

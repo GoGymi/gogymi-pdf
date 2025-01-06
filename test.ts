@@ -16,4 +16,5 @@ pdf.addTable([
 let a = new Array(50).fill(0)
 a.map((_, n) => pdf.addParagraph((n+1) + "."))
 pdf.addParagraph("END")
+pdf.addRichText(["TESTING THE RICH TEXT TO SEE IF IT WORKS IDK",{color: "#FF00FF", text: "SOME"},"MORE TEXT THAT MIGHT WRAP","SOME FINAL TEXT"],STYLES.h4)
 pdf.save("newtitle")
