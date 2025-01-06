@@ -61,8 +61,10 @@ export class PDF {
     for (let i of textElements) {
       if ((i.height + i.topLeft[1] - pageOffset) > 600) {
         pageOffset += 568
+        this.doc.addPage("a4", "p")
       }
       this.insertText(i.text,[i.topLeft[0],i.topLeft[1] - pageOffset],i.width, i.config)[1]()
+      this.y = (i.height + i.topLeft[1] - pageOffset)
     }
   }
   addHead() {
@@ -96,6 +98,7 @@ export class PDF {
     }]
   }
   richTextLayout(text: RichText, topLeft: [number, number], width: number, baseConfig?: TextConfig) {
+    this.doc.setFontSize(baseConfig?.size ?? 11)
     let offset: [number,number] = [topLeft[0] , topLeft[1]]
     let elements: InsertTextParams[] = []
 
@@ -104,19 +107,25 @@ export class PDF {
 
       let firstLine = this.doc.splitTextToSize(currentText, width - offset[0])[0]
 
-      let textWidth = this.doc.getStringUnitWidth(currentText) * this.doc.getFontSize()
+      let textWidth = this.doc.getStringUnitWidth(currentText) * this.doc.getFontSize() * 0.75 
 
       elements.push({
         text: firstLine,
         topLeft: [...offset],
-        width: textWidth,
+        width: textWidth + 20,
         height: this.doc.getFontSize(),
         config: {...baseConfig,...(typeof text[0] == "string" ? {} : text[0])}
       })
 
-      if (firstLine.length == currentText.length) {
+      if (currentText[0] == "\n") {
+        if (typeof text[0] == "string") {
+          text[0] = currentText.slice(1)
+        } else {
+          text[0].text = currentText.slice(1)
+        }
+      } else if (firstLine.length == currentText.length) {
         text = text.slice(1)
-        offset[0] += this.doc.getStringUnitWidth(currentText) * this.doc.getFontSize()
+        offset[0] += textWidth
       } else {
         offset[0] = topLeft[0]
         offset[1] += this.doc.getLineHeight()
@@ -162,7 +171,7 @@ export class PDF {
     }
 
     return [splitText.length * textSize + pt + pb, () => {
-      this.doc.text(splitText, x, topLeft[1] + pt, { align: config?.align ?? "left", baseline: "top", maxWidth: width - pl - pr });
+      this.doc.text(splitText, x, topLeft[1] + pt, { align: config?.align ?? "left", baseline: "top"});
     }]
   }
   addTable(contents: Array<Array<(positioning: [number, number, number]) => [number, () => void]>>, widths: number[], config?: any) {
