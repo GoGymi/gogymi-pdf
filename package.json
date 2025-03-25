@@ -7,6 +7,7 @@
     "typescript": "^5.7.2"
   },
   "scripts": {
-    "start": "tsc pdf.ts && pdf.js"
+    "start": "tsc pdf.ts && pdf.js",
+    "build": "tsc -p tsconfig.json"
   }
 }
