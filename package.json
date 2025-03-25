@@ -8,5 +8,6 @@
   },
   "scripts": {
     "start": "tsc pdf.ts && pdf.js"
-  }
+  },
+  "version": "0.1.0"
 }
