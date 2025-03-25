@@ -9,5 +9,6 @@
   "scripts": {
     "start": "tsc pdf.ts && pdf.js",
     "build": "tsc -p tsconfig.json"
-  }
+  },
+  "version": "0.1.1"
 }
