@@ -1,14 +1,17 @@
 {
   "name": "gogymi-pdf",
+  "version": "0.1.2",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
-    "jspdf": "^2.5.2"
+    "echarts": "^5.6.0"
   },
   "devDependencies": {
-    "typescript": "^5.7.2"
-  },
-  "scripts": {
-    "start": "tsc pdf.ts && pdf.js",
-    "build": "tsc -p tsconfig.json"
-  },
-  "version": "0.1.1"
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0"
+  }
 }

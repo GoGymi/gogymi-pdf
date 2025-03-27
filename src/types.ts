@@ -1,3 +1,5 @@
+import type { init } from "echarts"
+
 export interface TextConfig {
   size?: number;
   style?: "normal" | "itatlic" | "bold"
@@ -20,3 +22,4 @@ export interface InsertTextParams {
   config: TextConfig
   height: number;
 }
+export type EChartsInstance = ReturnType<typeof init>
