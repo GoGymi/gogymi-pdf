@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import type { TextConfig, PaddingConfig, InsertTextParams, EChartsInstance } from "./types";
+import type { TextConfig, PaddingConfig, InsertTextParams, EChartsInstance } from "./types.ts";
 import { init } from "echarts";
 
 export const STYLES = {
@@ -224,8 +224,12 @@ export class PDF {
     } else if (height == undefined) {
       width = width * (img.naturalHeight / img.naturalWidth)
     }
+    if (this.y + img.naturalHeight / SCALE > 600) {
+      this.y = 32
+      this.addPage()
+    }
     this.doc.addImage(img, format, 32, this.y, img.naturalWidth / SCALE, img.naturalHeight / SCALE)
-    this.y += img.naturalHeight
+    this.y += img.naturalHeight / SCALE
   }
   async addEchart(instance: EChartsInstance,w=800, h=500) {
     var canvas = document.createElement("canvas")
