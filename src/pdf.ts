@@ -114,7 +114,11 @@ export class PDF {
     let elements: InsertTextParams[] = []
 
     while (text.length > 0) {
+      let config = {...baseConfig,...(typeof text[0] == "string" ? {} : text[0])}
+
       let currentText = typeof text[0] == "string" ? text[0] : text[0].text
+
+      this.doc.setFont("Helvetica", config.style ?? "normal")
 
       let firstLine = this.doc.splitTextToSize(currentText, width - offset[0])[0]
 
@@ -125,7 +129,7 @@ export class PDF {
         topLeft: [...offset],
         width: textWidth + 20,
         height: this.doc.getFontSize(),
-        config: {...baseConfig,...(typeof text[0] == "string" ? {} : text[0])}
+        config
       })
 
       if (currentText[0] == "\n") {
