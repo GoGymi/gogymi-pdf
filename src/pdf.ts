@@ -140,7 +140,7 @@ export class PDF {
         }
       } else if (firstLine.length == currentText.length) {
         text = text.slice(1)
-        offset[0] += textWidth
+        offset[0] += textWidth + 1
       } else {
         offset[0] = topLeft[0]
         offset[1] += this.doc.getLineHeight()
@@ -186,6 +186,10 @@ export class PDF {
     }
 
     return [splitText.length * textSize + pt + pb, () => {
+      if (config?.bg) {
+        this.doc.setFillColor(config.bg)
+        this.doc.rect(x, topLeft[1] + pt, width - pl - pr - 20, splitText.length * textSize,"F")
+      }  
       this.doc.text(splitText, x, topLeft[1] + pt, { align: config?.align ?? "left", baseline: "top"});
     }]
   }

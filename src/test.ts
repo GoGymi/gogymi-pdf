@@ -52,7 +52,7 @@ async function test() {
     pdf.addParagraph((n+1) + ".")
   }
   pdf.addImage(img,"png")
-  pdf.addRichText(["TESTING THE RICH TEXT TO SEE IF IT WORKS IDK",{color: "#FF00FF", text: "SOME - ", style: "bold"},"MORE TEXT THAT MIGHT WRAP","SOME FINAL TEXT"],STYLES.h4)
+  pdf.addRichText(["TESTING THE RICH TEXT TO SEE IF IT WORKS IDK",{color: "#FF00FF", text: "SOME - ", style: "bold"},"MORE TEXT THAT MIGHT WRAP",{text: "SOME FINAL TEXT", bg: "#FF0000"}],STYLES.h4)
   await pdf.addEchart(chart)
   pdf.save("newtitle")
 }
