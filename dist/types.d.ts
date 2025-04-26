@@ -4,6 +4,7 @@ export interface TextConfig {
     style?: "normal" | "itatlic" | "bold";
     color?: string;
     align?: "left" | "center" | "right" | "justify";
+    bg?: string;
 }
 export interface PaddingConfig {
     p?: number;

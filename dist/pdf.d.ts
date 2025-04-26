@@ -34,7 +34,7 @@ export declare class PDF {
     computePadding(config?: PaddingConfig): number[];
     addParagraph(text: string, config?: TextConfig & PaddingConfig): void;
     addRichText(text: RichText, baseConfig: TextConfig & PaddingConfig): void;
-    addHead(img?: string | HTMLImageElement): void;
+    addHead(image?: string, url?: string): void;
     insertBar(value: number, maxValue: number, topLeft: [number, number], width: number, config?: PaddingConfig): [number, () => void];
     richTextLayout(text: RichText, topLeft: [number, number], width: number, baseConfig?: TextConfig): InsertTextParams[];
     insertText(text: string, topLeft: [number, number], width: number, config?: TextConfig & PaddingConfig): [number, () => void];
