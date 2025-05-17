@@ -222,6 +222,14 @@ export class PDF {
       this.y += h
     }
   }
+  addBlock(f: (positioning: [number, number, number]) => [number, () => void], config?: PaddingConfig) {
+    let [pl, pt, pr, pb] = this.computePadding(config)
+
+    const [h, init] = f([32+pl, this.y+pt, 384-pl-pr])
+
+    init()
+    this.y += h + pt + pb
+  }
   save(name?: string) {
     name = name ?? "test"
     this.doc.save(name + ".pdf");
