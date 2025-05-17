@@ -108,9 +108,9 @@ export class PDF {
     }
     addHR(baseConfig) {
         let [pl, pt, pr, pb] = this.computePadding(baseConfig);
-        this.doc.setDrawColor(baseConfig?.color ?? "#333333");
-        this.doc.line(32 + pl, this.y + pt, 416 + pr, this.y + pt);
-        this.y += pt + 1 + pb;
+        this.doc.setDrawColor(baseConfig?.color ?? "#555555");
+        this.doc.line(32 + pl, Math.round(this.y) + pt, 400 - pr, Math.round(this.y) + pt);
+        this.y += pt + 2 + pb;
     }
     richTextLayout(text, topLeft, width, baseConfig) {
         this.doc.setFontSize(baseConfig?.size ?? 11);

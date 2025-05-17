@@ -109,7 +109,7 @@ export class PDF {
     let [pl, pt, pr, pb] = this.computePadding(baseConfig)
 
     this.doc.setDrawColor(baseConfig?.color ?? "#555555")
-    this.doc.line(32+pl,Math.round(this.y)+pt,416-pr,Math.round(this.y)+pt)
+    this.doc.line(32+pl,Math.round(this.y)+pt,400-pr,Math.round(this.y)+pt)
     this.y += pt + 2 + pb
   }
   richTextLayout(text: RichText, topLeft: [number, number], width: number, baseConfig?: TextConfig) {
