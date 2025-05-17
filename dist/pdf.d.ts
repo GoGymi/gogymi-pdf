@@ -42,6 +42,7 @@ export declare class PDF {
     richTextLayout(text: RichText, topLeft: [number, number], width: number, baseConfig?: TextConfig): InsertTextParams[];
     insertText(text: string, topLeft: [number, number], width: number, config?: TextConfig & PaddingConfig): [number, () => void];
     addTable(contents: Array<Array<(positioning: [number, number, number]) => [number, () => void]>>, widths: number[], config?: any): void;
+    addBlock(f: (positioning: [number, number, number]) => [number, () => void], config?: PaddingConfig): void;
     save(name?: string): void;
     addImage(img: HTMLImageElement, format: string, height?: number, width?: number): void;
     addEchart(instance: EChartsInstance, w?: number, h?: number): Promise<void>;
