@@ -203,7 +203,7 @@ export class PDF {
             prev.push(a.slice(-1)[0] + prev.slice(-1)[0]);
             return prev;
         }
-        const lefts = cumSum0(filledWidths, 32);
+        const lefts = cumSum0(filledWidths, 32 + pl);
         this.y += pt;
         for (let i of contents) {
             let h = Math.max(...i.map((j, n) => j([lefts[n], this.y, filledWidths[n]])[0]));
