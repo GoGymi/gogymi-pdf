@@ -41,7 +41,7 @@ export declare class PDF {
     }): void;
     richTextLayout(text: RichText, topLeft: [number, number], width: number, baseConfig?: TextConfig): InsertTextParams[];
     insertText(text: string, topLeft: [number, number], width: number, config?: TextConfig & PaddingConfig): [number, () => void];
-    addTable(contents: Array<Array<(positioning: [number, number, number]) => [number, () => void]>>, widths: number[], config?: any): void;
+    addTable(contents: Array<Array<(positioning: [number, number, number]) => [number, () => void]>>, widths: Array<number | null>, config?: any): void;
     addBlock(f: (positioning: [number, number, number]) => [number, () => void], config?: PaddingConfig): void;
     save(name?: string): void;
     addImage(img: HTMLImageElement, format: string, height?: number, width?: number): void;

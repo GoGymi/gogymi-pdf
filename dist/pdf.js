@@ -189,6 +189,10 @@ export class PDF {
             }];
     }
     addTable(contents, widths, config) {
+        let [pl, pt, pr, pb] = this.computePadding(config);
+        const widthSum = widths.filter(i => i != null).reduce((acc, i) => acc + i);
+        const nullCount = widths.filter(i => i == null).length;
+        const filledWidths = widths.map(i => i != null ? i : (384 - pr - pl - widthSum) / nullCount);
         console.log(config);
         // Cumlative sum starting with 0
         function cumSum0(a, base) {
@@ -199,16 +203,18 @@ export class PDF {
             prev.push(a.slice(-1)[0] + prev.slice(-1)[0]);
             return prev;
         }
-        const lefts = cumSum0(widths, 32);
+        const lefts = cumSum0(filledWidths, 32);
+        this.y += pt;
         for (let i of contents) {
-            let h = Math.max(...i.map((j, n) => j([lefts[n], this.y, widths[n]])[0]));
+            let h = Math.max(...i.map((j, n) => j([lefts[n], this.y, filledWidths[n]])[0]));
             if (this.y + h > 600) {
                 this.y = 32;
                 this.addPage();
             }
-            i.map((j, n) => j([lefts[n], this.y, widths[n]])[1]());
+            i.map((j, n) => j([lefts[n], this.y, filledWidths[n]])[1]());
             this.y += h;
         }
+        this.y += pb;
     }
     addBlock(f, config) {
         let [pl, pt, pr, pb] = this.computePadding(config);
