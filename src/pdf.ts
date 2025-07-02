@@ -12,7 +12,7 @@ export const STYLES = {
   body2: { size: 10 },
 }
 
-type RichText = Array<string | TextConfig & { text: string }>
+type RichText = Array<string | TextConfig & PaddingConfig & { text: string }>
 
 export class PDF {
   doc: jsPDF;
@@ -113,13 +113,16 @@ export class PDF {
     this.y += pt + 2 + pb
   }
   richTextLayout(text: RichText, topLeft: [number, number], width: number, baseConfig?: TextConfig) {
+
+    
     let fontSize = baseConfig?.size ?? 11
     this.doc.setFontSize(fontSize)
     let offset: [number,number] = [topLeft[0] , topLeft[1]]
     let elements: InsertTextParams[] = []
-
+    
     while (text.length > 0) {
       let config = {...baseConfig,...(typeof text[0] == "string" ? {} : text[0])}
+      let [pl, pt, pr, pb] = this.computePadding(config)
 
       if (config.size) {
         fontSize = config.size
@@ -131,13 +134,13 @@ export class PDF {
       
       let firstLine = this.doc.splitTextToSize(currentText, width - offset[0])[0]
 
-      let textWidth = this.doc.getStringUnitWidth(currentText) * fontSize * 0.75 
+      let textWidth = this.doc.getStringUnitWidth(currentText) * fontSize * 0.75 + pl + pr
 
       elements.push({
         text: firstLine,
         topLeft: [...offset],
         width: textWidth + 20,
-        height: fontSize,
+        height: fontSize + pt + pb,
         config
       })
 
@@ -152,7 +155,7 @@ export class PDF {
         offset[0] += textWidth
       } else {
         offset[0] = topLeft[0]
-        offset[1] += this.doc.getLineHeight()
+        offset[1] += fontSize + pt + pb
         if (typeof text[0] == "string") {
           text[0] = currentText.slice(firstLine.length).trim()
         } else {
