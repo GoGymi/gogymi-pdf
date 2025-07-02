@@ -23,7 +23,7 @@ export declare const STYLES: {
         size: number;
     };
 };
-type RichText = Array<string | TextConfig & {
+type RichText = Array<string | TextConfig & PaddingConfig & {
     text: string;
 }>;
 export declare class PDF {

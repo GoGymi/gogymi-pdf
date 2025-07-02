@@ -119,18 +119,19 @@ export class PDF {
         let elements = [];
         while (text.length > 0) {
             let config = { ...baseConfig, ...(typeof text[0] == "string" ? {} : text[0]) };
+            let [pl, pt, pr, pb] = this.computePadding(config);
             if (config.size) {
                 fontSize = config.size;
             }
             let currentText = typeof text[0] == "string" ? text[0] : text[0].text;
             this.doc.setFont("Helvetica", config.style ?? "normal");
             let firstLine = this.doc.splitTextToSize(currentText, width - offset[0])[0];
-            let textWidth = this.doc.getStringUnitWidth(currentText) * fontSize * 0.75;
+            let textWidth = this.doc.getStringUnitWidth(currentText) * fontSize * 0.75 + pl + pr;
             elements.push({
                 text: firstLine,
                 topLeft: [...offset],
                 width: textWidth + 20,
-                height: fontSize,
+                height: fontSize + pt + pb,
                 config
             });
             if (currentText[0] == "\n") {
@@ -147,7 +148,7 @@ export class PDF {
             }
             else {
                 offset[0] = topLeft[0];
-                offset[1] += this.doc.getLineHeight();
+                offset[1] += fontSize + pt + pb;
                 if (typeof text[0] == "string") {
                     text[0] = currentText.slice(firstLine.length).trim();
                 }
