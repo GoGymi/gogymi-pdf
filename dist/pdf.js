@@ -191,7 +191,7 @@ export class PDF {
     addTable(contents, widths, config) {
         let [pl, pt, pr, pb] = this.computePadding(config);
         const borderWidth = config?.border?.width ?? (config?.border ? 1 : 0);
-        const widthSum = widths.filter(i => i != null).reduce((acc, i) => acc + i);
+        const widthSum = widths.filter(i => i != null).reduce((acc, i) => acc + i, 0);
         const nullCount = widths.filter(i => i == null).length;
         const filledWidths = widths.map(i => i != null ? i : (384 - pr - pl - widthSum) / nullCount);
         console.log(config);

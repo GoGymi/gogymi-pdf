@@ -202,7 +202,7 @@ export class PDF {
 
     const borderWidth = config?.border?.width ?? (config?.border ? 1 : 0);
 
-    const widthSum = widths.filter(i => i != null).reduce((acc, i) => acc + i)
+    const widthSum = widths.filter(i => i != null).reduce((acc, i) => acc + i, 0)
 
     const nullCount = widths.filter(i => i == null).length
 
