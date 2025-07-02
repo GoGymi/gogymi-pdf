@@ -144,7 +144,7 @@ export class PDF {
         }
       } else if (firstLine.length == currentText.length) {
         text = text.slice(1)
-        offset[0] += textWidth + 1
+        offset[0] += textWidth
       } else {
         offset[0] = topLeft[0]
         offset[1] += this.doc.getLineHeight()
