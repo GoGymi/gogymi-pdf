@@ -190,6 +190,7 @@ export class PDF {
     }
     addTable(contents, widths, config) {
         let [pl, pt, pr, pb] = this.computePadding(config);
+        const borderWidth = config?.border?.width ?? (config?.border ? 1 : 0);
         const widthSum = widths.filter(i => i != null).reduce((acc, i) => acc + i);
         const nullCount = widths.filter(i => i == null).length;
         const filledWidths = widths.map(i => i != null ? i : (384 - pr - pl - widthSum) / nullCount);
@@ -203,8 +204,21 @@ export class PDF {
             prev.push(a.slice(-1)[0] + prev.slice(-1)[0]);
             return prev;
         }
-        const lefts = cumSum0(filledWidths, 32 + pl);
+        const lefts = cumSum0(filledWidths, 32 + pl + borderWidth);
         this.y += pt;
+        // Calculate total table height
+        let totalHeight = 0;
+        for (let i of contents) {
+            let h = Math.max(...i.map((j, n) => j([lefts[n], this.y + totalHeight, filledWidths[n]])[0]));
+            totalHeight += h;
+        }
+        // Draw background and border for the entire table
+        const tableX = 32 + pl;
+        const tableY = this.y;
+        const tableWidth = 384 - pl - pr;
+        const tableHeight = totalHeight;
+        this.drawBackgroundAndBorder(tableX, tableY, tableWidth, tableHeight, config);
+        // Draw table contents
         for (let i of contents) {
             let h = Math.max(...i.map((j, n) => j([lefts[n], this.y, filledWidths[n]])[0]));
             if (this.y + h > 600) {
@@ -216,11 +230,63 @@ export class PDF {
         }
         this.y += pb;
     }
+    drawBackgroundAndBorder(x, y, width, height, config) {
+        const borderWidth = config?.border?.width ?? (config?.border ? 1 : 0);
+        const borderRadius = config?.borderRadius ?? 0;
+        // Account for border width in positioning and sizing
+        const contentX = x + borderWidth;
+        const contentY = y + borderWidth;
+        const contentWidth = width - (borderWidth * 2);
+        const contentHeight = height - (borderWidth * 2);
+        // Draw background (inside the border)
+        if (config?.bg) {
+            this.doc.setFillColor(config.bg);
+            if (borderRadius > 0) {
+                this.doc.roundedRect(contentX, contentY, contentWidth, contentHeight, borderRadius, borderRadius, "F");
+            }
+            else {
+                this.doc.rect(contentX, contentY, contentWidth, contentHeight, "F");
+            }
+        }
+        // Draw border
+        if (config?.border) {
+            const borderColor = config.border.color ?? "#000000";
+            const borderStyle = config.border.style ?? "solid";
+            this.doc.setDrawColor(borderColor);
+            this.doc.setLineWidth(borderWidth);
+            // Set line dash pattern based on style
+            if (borderStyle === "dashed") {
+                this.doc.setLineDashPattern([5, 5], 0);
+            }
+            else if (borderStyle === "dotted") {
+                this.doc.setLineDashPattern([2, 2], 0);
+            }
+            else {
+                this.doc.setLineDashPattern([], 0); // solid
+            }
+            if (borderRadius > 0) {
+                this.doc.roundedRect(contentX, contentY, contentWidth, contentHeight, borderRadius, borderRadius, "S");
+            }
+            else {
+                this.doc.rect(contentX, contentY, contentWidth, contentHeight, "S");
+            }
+            // Reset line dash pattern
+            this.doc.setLineDashPattern([], 0);
+        }
+    }
     addBlock(f, config) {
         let [pl, pt, pr, pb] = this.computePadding(config);
-        const [h, init] = f([32 + pl, this.y + pt, 384 - pl - pr]);
+        const borderWidth = config?.border?.width ?? 0;
+        const [h, init] = f([32 + pl + borderWidth, this.y + pt + borderWidth, 384 - pl - pr - (borderWidth * 2)]);
+        // Draw background and border before content
+        const x = 32 + pl;
+        const y = this.y + pt;
+        const width = 384 - pl - pr;
+        const height = h;
+        this.drawBackgroundAndBorder(x, y, width, height, config);
+        // Then draw content
         init();
-        this.y += h + pt + pb;
+        this.y += h + pt + pb + (borderWidth * 2);
     }
     save(name) {
         name = name ?? "test";

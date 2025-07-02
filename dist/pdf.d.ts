@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import type { TextConfig, PaddingConfig, InsertTextParams, EChartsInstance } from "./types.ts";
+import type { TextConfig, PaddingConfig, InsertTextParams, EChartsInstance, BlockConfig } from "./types.ts";
 export declare const STYLES: {
     h1: {
         size: number;
@@ -41,8 +41,9 @@ export declare class PDF {
     }): void;
     richTextLayout(text: RichText, topLeft: [number, number], width: number, baseConfig?: TextConfig): InsertTextParams[];
     insertText(text: string, topLeft: [number, number], width: number, config?: TextConfig & PaddingConfig): [number, () => void];
-    addTable(contents: Array<Array<(positioning: [number, number, number]) => [number, () => void]>>, widths: Array<number | null>, config?: any): void;
-    addBlock(f: (positioning: [number, number, number]) => [number, () => void], config?: PaddingConfig): void;
+    addTable(contents: Array<Array<(positioning: [number, number, number]) => [number, () => void]>>, widths: Array<number | null>, config?: BlockConfig): void;
+    drawBackgroundAndBorder(x: number, y: number, width: number, height: number, config?: BlockConfig): void;
+    addBlock(f: (positioning: [number, number, number]) => [number, () => void], config?: BlockConfig): void;
     save(name?: string): void;
     addImage(img: HTMLImageElement, format: string, height?: number, width?: number): void;
     addEchart(instance: EChartsInstance, w?: number, h?: number): Promise<void>;

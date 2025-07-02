@@ -53,6 +53,78 @@ async function test() {
   }
   pdf.addImage(img,"png")
   pdf.addRichText(["TESTING THE RICH TEXT TO SEE IF IT WORKS IDK",{color: "#FF00FF", text: "SOME - ", style: "bold"},"MORE TEXT THAT MIGHT WRAP",{text: "SOME FINAL TEXT", bg: "#FF0000"}],STYLES.h4)
+  
+  // Test new addBlock functionality with backgrounds, borders, and rounding
+  pdf.addBlock(
+    ([x, y, width]) => {
+      return pdf.insertText("This is a block with a light blue background", [x, y], width, {
+        size: 14,
+        align: "center"
+      });
+    },
+    {
+      bg: "#e6f3ff",
+      p: 20
+    }
+  );
+
+  // Block with border and rounded corners
+  pdf.addBlock(
+    ([x, y, width]) => {
+      return pdf.insertText("This block has a border and rounded corners", [x, y], width, {
+        size: 14,
+        align: "center"
+      });
+    },
+    {
+      border: {
+        color: "#333333",
+        width: 2,
+        style: "solid"
+      },
+      borderRadius: 10,
+      p: 20
+    }
+  );
+
+  // Block with background, border, and dashed style
+  pdf.addBlock(
+    ([x, y, width]) => {
+      return pdf.insertText("This block has a background, dashed border, and rounded corners", [x, y], width, {
+        size: 14,
+        align: "center"
+      });
+    },
+    {
+      bg: "#fff2e6",
+      border: {
+        color: "#ff6600",
+        width: 1,
+        style: "dashed"
+      },
+      borderRadius: 8,
+      p: 20
+    }
+  );
+
+  // Block with dotted border
+  pdf.addBlock(
+    ([x, y, width]) => {
+      return pdf.insertText("This block has a dotted border", [x, y], width, {
+        size: 14,
+        align: "center"
+      });
+    },
+    {
+      border: {
+        color: "#666666",
+        width: 1,
+        style: "dotted"
+      },
+      p: 20
+    }
+  );
+
   await pdf.addEchart(chart)
   pdf.save("newtitle")
 }

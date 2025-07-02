@@ -2,7 +2,7 @@ import type { init } from "echarts"
 
 export interface TextConfig {
   size?: number;
-  style?: "normal" | "itatlic" | "bold"
+  style?: "normal" | "italic" | "bold"
   color?: string
   align?: "left" | "center" | "right" | "justify"
   bg?: string
@@ -15,6 +15,15 @@ export interface PaddingConfig {
   pt?: number;
   pr?: number;
   pb?: number;
+}
+export interface BlockConfig extends PaddingConfig {
+  bg?: string;
+  border?: {
+    color?: string;
+    width?: number;
+    style?: "solid" | "dashed" | "dotted";
+  };
+  borderRadius?: number;
 }
 export interface InsertTextParams {
   text: string;
