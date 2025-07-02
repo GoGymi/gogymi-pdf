@@ -113,20 +113,24 @@ export class PDF {
         this.y += pt + 2 + pb;
     }
     richTextLayout(text, topLeft, width, baseConfig) {
-        this.doc.setFontSize(baseConfig?.size ?? 11);
+        let fontSize = baseConfig?.size ?? 11;
+        this.doc.setFontSize(fontSize);
         let offset = [topLeft[0], topLeft[1]];
         let elements = [];
         while (text.length > 0) {
             let config = { ...baseConfig, ...(typeof text[0] == "string" ? {} : text[0]) };
+            if (config.size) {
+                fontSize = config.size;
+            }
             let currentText = typeof text[0] == "string" ? text[0] : text[0].text;
             this.doc.setFont("Helvetica", config.style ?? "normal");
             let firstLine = this.doc.splitTextToSize(currentText, width - offset[0])[0];
-            let textWidth = this.doc.getStringUnitWidth(currentText) * this.doc.getFontSize() * 0.75;
+            let textWidth = this.doc.getStringUnitWidth(currentText) * fontSize * 0.75;
             elements.push({
                 text: firstLine,
                 topLeft: [...offset],
                 width: textWidth + 20,
-                height: this.doc.getFontSize(),
+                height: fontSize,
                 config
             });
             if (currentText[0] == "\n") {
