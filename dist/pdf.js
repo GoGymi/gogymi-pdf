@@ -232,7 +232,7 @@ export class PDF {
             y += h;
         }
         // Draw background and border for final section
-        this.drawBackgroundAndBorder(tableX, startY, tableWidth, y - startY, config);
+        this.drawBackgroundAndBorder(tableX, pageStartY, tableWidth, y - pageStartY + (config?.pageBreak == "join" ? 1000 : 0), config);
         // Reset to original page
         this.doc.setPage(this.doc.getCurrentPageInfo().pageNumber - pagesSkipped);
         // Draw table contents
