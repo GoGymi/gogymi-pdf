@@ -33,9 +33,13 @@ export class PDF {
         this.addPage(true);
     }
     addPage(justNum = false) {
-        if (!justNum) {
-            this.doc.addPage("a4", "p");
-        }
+        if (!justNum)
+            if (this.doc.getCurrentPageInfo().pageNumber == this.doc.getNumberOfPages()) {
+                this.doc.addPage("a4", "p");
+            }
+            else {
+                this.doc.setPage(this.doc.getCurrentPageInfo().pageNumber + 1);
+            }
         this.insertText(this.doc.getNumberOfPages().toString(), [220, 610], 100)[1]();
     }
     computePadding(config) {
