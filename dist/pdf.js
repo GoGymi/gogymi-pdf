@@ -211,18 +211,30 @@ export class PDF {
         }
         const lefts = cumSum0(filledWidths, 32 + pl + borderWidth);
         this.y += pt;
-        // Calculate total table height
-        let totalHeight = 0;
-        for (let i of contents) {
-            let h = Math.max(...i.map((j, n) => j([lefts[n], this.y + totalHeight, filledWidths[n]])[0]));
-            totalHeight += h;
-        }
-        // Draw background and border for the entire table
+        // Calculate total table height and draw backgrounds/borders
+        let y = this.y;
+        let pagesSkipped = 0;
+        let startY = this.y;
+        let pageStartY = this.y;
         const tableX = 32 + pl;
-        const tableY = this.y;
         const tableWidth = 384 - pl - pr;
-        const tableHeight = totalHeight;
-        this.drawBackgroundAndBorder(tableX, tableY, tableWidth, tableHeight, config);
+        for (let i of contents) {
+            let h = Math.max(...i.map((j, n) => j([lefts[n], y, filledWidths[n]])[0]));
+            if (y + h > 600) {
+                // Draw background and border for current page section
+                this.drawBackgroundAndBorder(tableX, pageStartY, tableWidth, y - pageStartY + (config?.pageBreak == "join" ? 1000 : 0), config);
+                // Move to new page
+                this.addPage();
+                pagesSkipped++;
+                y = 32;
+                pageStartY = config?.pageBreak == "join" ? -1000 : 32;
+            }
+            y += h;
+        }
+        // Draw background and border for final section
+        this.drawBackgroundAndBorder(tableX, startY, tableWidth, y - startY, config);
+        // Reset to original page
+        this.doc.setPage(this.doc.getCurrentPageInfo().pageNumber - pagesSkipped);
         // Draw table contents
         for (let i of contents) {
             let h = Math.max(...i.map((j, n) => j([lefts[n], this.y, filledWidths[n]])[0]));
