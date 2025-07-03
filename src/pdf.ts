@@ -257,7 +257,7 @@ export class PDF {
     this.drawBackgroundAndBorder(tableX, pageStartY, tableWidth, y - pageStartY, config);
     
     // Reset to original page
-    this.doc.setPage(this.doc.getCurrentPageInfo().pageNumber - pagesSkipped - 1)
+    this.doc.setPage(this.doc.getCurrentPageInfo().pageNumber - pagesSkipped)
 
     // Draw table contents
     for (let i of contents) {

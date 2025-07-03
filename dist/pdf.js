@@ -233,7 +233,7 @@ export class PDF {
         // Draw background and border for final section
         this.drawBackgroundAndBorder(tableX, pageStartY, tableWidth, y - pageStartY, config);
         // Reset to original page
-        this.doc.setPage(this.doc.getCurrentPageInfo().pageNumber - pagesSkipped - 1);
+        this.doc.setPage(this.doc.getCurrentPageInfo().pageNumber - pagesSkipped);
         // Draw table contents
         for (let i of contents) {
             let h = Math.max(...i.map((j, n) => j([lefts[n], this.y, filledWidths[n]])[0]));
