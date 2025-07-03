@@ -24,6 +24,7 @@ export interface BlockConfig extends PaddingConfig {
     style?: "solid" | "dashed" | "dotted";
   };
   borderRadius?: number;
+  pageBreak?: "join" | "split";
 }
 export interface InsertTextParams {
   text: string;
