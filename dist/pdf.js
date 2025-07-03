@@ -214,7 +214,6 @@ export class PDF {
         // Calculate total table height and draw backgrounds/borders
         let y = this.y;
         let pagesSkipped = 0;
-        let startY = this.y;
         let pageStartY = this.y;
         const tableX = 32 + pl;
         const tableWidth = 384 - pl - pr;
@@ -234,7 +233,7 @@ export class PDF {
         // Draw background and border for final section
         this.drawBackgroundAndBorder(tableX, pageStartY, tableWidth, y - pageStartY + (config?.pageBreak == "join" ? 1000 : 0), config);
         // Reset to original page
-        this.doc.setPage(this.doc.getCurrentPageInfo().pageNumber - pagesSkipped);
+        this.doc.setPage(this.doc.getCurrentPageInfo().pageNumber - pagesSkipped - 1);
         // Draw table contents
         for (let i of contents) {
             let h = Math.max(...i.map((j, n) => j([lefts[n], this.y, filledWidths[n]])[0]));
