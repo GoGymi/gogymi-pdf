@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import type { TextConfig, PaddingConfig, InsertTextParams, EChartsInstance, BlockConfig } from "./types.ts";
+import type { TextConfig, PaddingConfig, InsertTextParams, EChartsInstance, BlockConfig, PreparedImage } from "./types.ts";
 export declare const STYLES: {
     h1: {
         size: number;
@@ -23,14 +23,17 @@ export declare const STYLES: {
         size: number;
     };
 };
-type RichText = Array<string | TextConfig & PaddingConfig & {
+type RichText = Array<string | (TextConfig & PaddingConfig & {
     text: string;
-}>;
+})>;
+export declare function prepareImage(image: string): Promise<PreparedImage>;
 export declare class PDF {
     doc: jsPDF;
     y: number;
+    headerImage?: PreparedImage;
     constructor();
-    addPage(justNum?: boolean): void;
+    addNum(): void;
+    addPage(): void;
     computePadding(config?: PaddingConfig): number[];
     addParagraph(text: string, config?: TextConfig & PaddingConfig): void;
     addRichText(text: RichText, baseConfig: TextConfig & PaddingConfig): void;

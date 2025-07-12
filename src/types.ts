@@ -33,4 +33,8 @@ export interface InsertTextParams {
   config: TextConfig
   height: number;
 }
+export interface PreparedImage {
+  image: string;
+  aspectRatio: number;
+}
 export type EChartsInstance = ReturnType<typeof init>
