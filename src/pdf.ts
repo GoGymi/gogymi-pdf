@@ -379,7 +379,7 @@ export class PDF {
       prev.push(a.slice(-1)[0] + prev.slice(-1)[0]);
       return prev;
     }
-    const lefts = cumSum0(filledWidths, 32 + pl + borderWidth);
+    const lefts = cumSum0(filledWidths, 32 + pl);
 
     this.y += pt;
 
