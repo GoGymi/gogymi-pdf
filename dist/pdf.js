@@ -305,7 +305,7 @@ export class PDF {
             }));
             if (y + h > 600) {
                 // Draw background and border for current page section
-                this.drawBackgroundAndBorder(tableX, pageStartY, tableWidth, y - pageStartY + (config?.pageBreak == "join" ? 1000 : 0), config);
+                this.drawBackgroundAndBorder(tableX, pageStartY, tableWidth + pl + pr, y - pageStartY + (config?.pageBreak == "join" ? 1000 : 0), config);
                 // Move to new page
                 this.addPage();
                 pagesSkipped++;
@@ -315,7 +315,7 @@ export class PDF {
             y += h;
         }
         // Draw background and border for final section
-        this.drawBackgroundAndBorder(tableX, pageStartY, tableWidth, y - pageStartY, config);
+        this.drawBackgroundAndBorder(tableX, pageStartY, tableWidth + pl + pr, y - pageStartY, config);
         // Reset to original page
         this.doc.setPage(this.doc.getCurrentPageInfo().pageNumber - pagesSkipped);
         // Draw table contents

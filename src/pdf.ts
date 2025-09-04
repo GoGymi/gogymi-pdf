@@ -407,7 +407,7 @@ export class PDF {
         this.drawBackgroundAndBorder(
           tableX,
           pageStartY,
-          tableWidth,
+          tableWidth + pl + pr,
           y - pageStartY + (config?.pageBreak == "join" ? 1000 : 0),
           config
         );
@@ -425,7 +425,7 @@ export class PDF {
     this.drawBackgroundAndBorder(
       tableX,
       pageStartY,
-      tableWidth,
+      tableWidth + pl + pr,
       y - pageStartY,
       config
     );
