@@ -232,6 +232,9 @@ export class PDF {
         this.doc.setTextColor(textColor);
         let [pl, pt, pr, pb] = this.computePadding(config);
         let splitText = this.doc.splitTextToSize(text, width - pl - pr);
+        console.log("splitText", text);
+        console.log(width);
+        console.log(pl, pr);
         let x;
         switch (config?.align ?? "left") {
             case "left":
@@ -268,7 +271,11 @@ export class PDF {
             .filter((i) => i != null)
             .reduce((acc, i) => acc + i, 0);
         const nullCount = widths.filter((i) => i == null).length;
-        const filledWidths = widths.map((i) => i != null ? i : (384 - pr - pl - widthSum) / nullCount);
+        // Calculate available width for content (excluding borders and padding)
+        const availableWidth = 384 - pl - pr - (borderWidth * 2);
+        const filledWidths = widths.map((i) => i != null
+            ? i
+            : (availableWidth - widthSum) / nullCount);
         console.log(config);
         // Cumlative sum starting with 0
         function cumSum0(a, base) {
@@ -287,8 +294,15 @@ export class PDF {
         let pageStartY = this.y;
         const tableX = 32 + pl;
         const tableWidth = 384 - pl - pr;
+        console.log("filledWidths", filledWidths);
         for (let i of contents) {
-            let h = Math.max(...i.map((j, n) => j([lefts[n], y, filledWidths[n]])[0]));
+            let h = Math.max(...i.map((j, n) => {
+                // Calculate height with proper border width accounting
+                const adjustedLeft = lefts[n] + borderWidth;
+                const adjustedWidth = filledWidths[n] - (borderWidth * 2);
+                const adjustedY = y + borderWidth;
+                return j([adjustedLeft, adjustedY, adjustedWidth])[0];
+            }));
             if (y + h > 600) {
                 // Draw background and border for current page section
                 this.drawBackgroundAndBorder(tableX, pageStartY, tableWidth, y - pageStartY + (config?.pageBreak == "join" ? 1000 : 0), config);
@@ -306,12 +320,27 @@ export class PDF {
         this.doc.setPage(this.doc.getCurrentPageInfo().pageNumber - pagesSkipped);
         // Draw table contents
         for (let i of contents) {
-            let h = Math.max(...i.map((j, n) => j([lefts[n], this.y, filledWidths[n]])[0]));
+            let h = Math.max(...i.map((j, n) => {
+                // Calculate height with proper border width accounting
+                const adjustedLeft = lefts[n] + borderWidth;
+                const adjustedWidth = filledWidths[n] - (borderWidth * 2);
+                const adjustedY = this.y + borderWidth;
+                return j([adjustedLeft, adjustedY, adjustedWidth])[0];
+            }));
             if (this.y + h > 600) {
                 this.y = 32;
                 this.addPage();
             }
-            i.map((j, n) => j([lefts[n], this.y, filledWidths[n]])[1]());
+            // Render content with proper border width accounting
+            i.forEach((j, n) => {
+                // Adjust positioning and width to account for border width
+                const adjustedLeft = lefts[n] + borderWidth;
+                const adjustedWidth = filledWidths[n] - (borderWidth * 2);
+                const adjustedY = this.y + borderWidth;
+                // Call the content function with adjusted dimensions
+                const [, renderFunc] = j([adjustedLeft, adjustedY, adjustedWidth]);
+                renderFunc();
+            });
             this.y += h;
         }
         this.y += pb;
